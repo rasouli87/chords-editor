@@ -1389,6 +1389,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 label: `Cut Chord "${chordText}"`,
                 icon: '✂',
                 action: cutChordFromContextMenu
+            },
+            {
+                label: `Delete Chord "${chordText}"`,
+                icon: '🗑️',
+                action: deleteChordFromContextMenu
             }
         ];
 
@@ -1518,6 +1523,42 @@ document.addEventListener('DOMContentLoaded', () => {
         const lineText = lines[line];
 
         // Handle --- and / markers
+        let fullChordText = chordWithBrackets;
+        let afterChordPos = pos + chordWithBrackets.length;
+
+        if (lineText.substring(afterChordPos, afterChordPos + 3) === '---') {
+            fullChordText += '---';
+            afterChordPos += 3;
+        }
+
+        let beforeChordPos = pos;
+        if (pos > 0 && lineText.charAt(pos - 1) === '/') {
+            fullChordText = '/' + fullChordText;
+            beforeChordPos = pos - 1;
+        }
+
+        const beforeChord = lineText.substring(0, beforeChordPos);
+        const afterChord = lineText.substring(afterChordPos);
+        lines[line] = beforeChord + afterChord;
+
+        lyricsInput.value = lines.join('\n');
+        updatePreview();
+    }
+
+    // Delete chord from context menu
+    function deleteChordFromContextMenu() {
+        if (!contextMenuTarget) return;
+
+        const chordText = contextMenuTarget.getAttribute('data-chord');
+        const line = parseInt(contextMenuTarget.getAttribute('data-line'));
+        const pos = parseInt(contextMenuTarget.getAttribute('data-pos'));
+
+        // Remove chord from text (without storing in buffer)
+        const lines = lyricsInput.value.split('\n');
+        const lineText = lines[line];
+
+        // Handle --- and / markers
+        const chordWithBrackets = `[${chordText}]`;
         let fullChordText = chordWithBrackets;
         let afterChordPos = pos + chordWithBrackets.length;
 
