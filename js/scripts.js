@@ -806,6 +806,14 @@ document.addEventListener('DOMContentLoaded', () => {
     contextMenuElement.className = 'context-menu hidden';
     document.body.appendChild(contextMenuElement);
 
+    // Add sample lyrics if textarea is empty
+    if (!lyricsInput.value.trim()) {
+        lyricsInput.value = `[C]سلام دنیا، [G]خوش آمدید
+[Am]این یک نمونه [F]است
+[C]روی آکوردها [G]راست کلیک کنید
+[F]برای کپی یا [G]پیست`;
+    }
+
     // Initialize the preview
     updatePreview();
 
