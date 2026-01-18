@@ -1471,9 +1471,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Position context menu
     function positionContextMenu(x, y) {
-        // Set initial position
-        contextMenuElement.style.left = x + 'px';
-        contextMenuElement.style.top = y + 'px';
+        // Add small offset so menu appears near cursor but not directly under it
+        const offsetX = 5;
+        const offsetY = 5;
+
+        // Set initial position with offset
+        contextMenuElement.style.left = (x + offsetX) + 'px';
+        contextMenuElement.style.top = (y + offsetY) + 'px';
+        contextMenuElement.style.display = 'block';
 
         // Ensure menu stays within viewport
         const menuRect = contextMenuElement.getBoundingClientRect();
@@ -1482,12 +1487,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Adjust horizontal position if menu goes off-screen
         if (menuRect.right > viewportWidth) {
-            contextMenuElement.style.left = (x - menuRect.width) + 'px';
+            // Position to the left of cursor instead
+            contextMenuElement.style.left = (x - menuRect.width - offsetX) + 'px';
         }
 
         // Adjust vertical position if menu goes off-screen
         if (menuRect.bottom > viewportHeight) {
-            contextMenuElement.style.top = (y - menuRect.height) + 'px';
+            // Position above cursor instead
+            contextMenuElement.style.top = (y - menuRect.height - offsetY) + 'px';
         }
     }
 
