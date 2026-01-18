@@ -1466,7 +1466,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Position and show menu
         positionContextMenu(x, y);
-        contextMenuElement.classList.remove('hidden');
     }
 
     // Position context menu
@@ -1478,9 +1477,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // Set initial position with offset
         contextMenuElement.style.left = (x + offsetX) + 'px';
         contextMenuElement.style.top = (y + offsetY) + 'px';
-        contextMenuElement.style.display = 'block';
 
         // Ensure menu stays within viewport
+        // Need to temporarily show it to measure
+        contextMenuElement.style.visibility = 'hidden';
+        contextMenuElement.classList.remove('hidden');
+
         const menuRect = contextMenuElement.getBoundingClientRect();
         const viewportWidth = window.innerWidth;
         const viewportHeight = window.innerHeight;
@@ -1496,11 +1498,15 @@ document.addEventListener('DOMContentLoaded', () => {
             // Position above cursor instead
             contextMenuElement.style.top = (y - menuRect.height - offsetY) + 'px';
         }
+
+        // Now make it visible
+        contextMenuElement.style.visibility = 'visible';
     }
 
     // Hide context menu
     function hideContextMenu() {
         contextMenuElement.classList.add('hidden');
+        contextMenuElement.style.visibility = 'hidden';
         contextMenuTarget = null;
     }
 
