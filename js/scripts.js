@@ -1542,6 +1542,17 @@ document.addEventListener('DOMContentLoaded', () => {
         lines[line] = beforeChord + afterChord;
 
         lyricsInput.value = lines.join('\n');
+
+        // Clear selected chord and character states
+        if (selectedChordElement) {
+            selectedChordElement.classList.remove('selected');
+            selectedChordElement = null;
+        }
+        if (selectedCharacterElement) {
+            selectedCharacterElement.classList.remove('char-selected');
+            selectedCharacterElement = null;
+        }
+
         updatePreview();
     }
 
@@ -1578,6 +1589,17 @@ document.addEventListener('DOMContentLoaded', () => {
         lines[line] = beforeChord + afterChord;
 
         lyricsInput.value = lines.join('\n');
+
+        // Clear selected chord and character states
+        if (selectedChordElement) {
+            selectedChordElement.classList.remove('selected');
+            selectedChordElement = null;
+        }
+        if (selectedCharacterElement) {
+            selectedCharacterElement.classList.remove('char-selected');
+            selectedCharacterElement = null;
+        }
+
         updatePreview();
     }
 
