@@ -1409,6 +1409,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 label: 'Add New Chord Here',
                 icon: '➕',
                 action: addNewChordAtCharacter
+            },
+            {
+                label: 'Add --- Here',
+                icon: '➖',
+                action: addDashAtCharacter
+            },
+            {
+                label: 'Add / Here',
+                icon: '➗',
+                action: addSlashAtCharacter
             }
         ];
 
@@ -1653,6 +1663,80 @@ document.addEventListener('DOMContentLoaded', () => {
         const lines = lyricsInput.value.split('\n');
         const lineText = lines[line];
         lines[line] = lineText.substring(0, pos) + `[${chordName}]` + lineText.substring(pos);
+
+        lyricsInput.value = lines.join('\n');
+        updatePreview();
+    }
+
+    // Add --- at character position
+    function addDashAtCharacter() {
+        if (!contextMenuTarget) return;
+
+        // Find the insertion point before this character
+        const lineContainer = contextMenuTarget.closest('.line-container');
+        const lyricsLine = lineContainer.querySelector('.lyrics-line');
+
+        // Find corresponding insertion point
+        const insertionPoints = Array.from(lyricsLine.querySelectorAll('.insert-point'));
+        let targetInsertionPoint = null;
+
+        for (let i = 0; i < insertionPoints.length; i++) {
+            const nextChar = insertionPoints[i].nextElementSibling;
+            if (nextChar === contextMenuTarget) {
+                targetInsertionPoint = insertionPoints[i];
+                break;
+            }
+        }
+
+        if (!targetInsertionPoint) {
+            alert('Could not find position for character');
+            return;
+        }
+
+        const line = parseInt(targetInsertionPoint.getAttribute('data-line'));
+        const pos = parseInt(targetInsertionPoint.getAttribute('data-pos'));
+
+        // Insert ---
+        const lines = lyricsInput.value.split('\n');
+        const lineText = lines[line];
+        lines[line] = lineText.substring(0, pos) + '---' + lineText.substring(pos);
+
+        lyricsInput.value = lines.join('\n');
+        updatePreview();
+    }
+
+    // Add / at character position
+    function addSlashAtCharacter() {
+        if (!contextMenuTarget) return;
+
+        // Find the insertion point before this character
+        const lineContainer = contextMenuTarget.closest('.line-container');
+        const lyricsLine = lineContainer.querySelector('.lyrics-line');
+
+        // Find corresponding insertion point
+        const insertionPoints = Array.from(lyricsLine.querySelectorAll('.insert-point'));
+        let targetInsertionPoint = null;
+
+        for (let i = 0; i < insertionPoints.length; i++) {
+            const nextChar = insertionPoints[i].nextElementSibling;
+            if (nextChar === contextMenuTarget) {
+                targetInsertionPoint = insertionPoints[i];
+                break;
+            }
+        }
+
+        if (!targetInsertionPoint) {
+            alert('Could not find position for character');
+            return;
+        }
+
+        const line = parseInt(targetInsertionPoint.getAttribute('data-line'));
+        const pos = parseInt(targetInsertionPoint.getAttribute('data-pos'));
+
+        // Insert /
+        const lines = lyricsInput.value.split('\n');
+        const lineText = lines[line];
+        lines[line] = lineText.substring(0, pos) + '/' + lineText.substring(pos);
 
         lyricsInput.value = lines.join('\n');
         updatePreview();
