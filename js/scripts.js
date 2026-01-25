@@ -783,6 +783,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnAddSlash = document.getElementById('btn-add-slash');
     const btnUndoChord = document.getElementById('btn-undo-chord');
     const btnCharSelectMode = document.getElementById('btn-char-select-mode');
+    const btnCopyChord = document.getElementById('btn-copy-chord');
+    const btnDeleteChord = document.getElementById('btn-delete-chord');
 
     // State
     let currentHtml = "";
@@ -838,6 +840,8 @@ document.addEventListener('DOMContentLoaded', () => {
     btnCharSelectMode.addEventListener('click', toggleCharacterSelectionMode);
     btnHtmlPreview.addEventListener('click', toggleHtmlPreview);
     capoInput.addEventListener('change', applyCapo);
+    btnCopyChord.addEventListener('click', copyChordFromButton);
+    btnDeleteChord.addEventListener('click', deleteChordFromButton);
 
     // Add toggle accidentals button if it exists
     const btnToggleAccidentals = document.getElementById('btn-toggle-accidentals');
@@ -1394,6 +1398,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 label: `Delete Chord "${chordText}"`,
                 icon: '🗑️',
                 action: deleteChordFromContextMenu
+            },
+            {
+                label: `Add --- after Chord`,
+                icon: '➖',
+                action: addDashToChordFromContextMenu
+            },
+            {
+                label: `Add / before Chord`,
+                icon: '➗',
+                action: addSlashToChordFromContextMenu
             }
         ];
 
@@ -1626,6 +1640,57 @@ document.addEventListener('DOMContentLoaded', () => {
         updatePreview();
     }
 
+    // Add --- after chord from context menu
+    function addDashToChordFromContextMenu() {
+        if (!contextMenuTarget) return;
+
+        const chordText = contextMenuTarget.getAttribute('data-chord');
+        const line = parseInt(contextMenuTarget.getAttribute('data-line'));
+        const pos = parseInt(contextMenuTarget.getAttribute('data-pos'));
+
+        const lines = lyricsInput.value.split('\n');
+        const lineText = lines[line];
+
+        // Find the end of the chord (after the ])
+        const chordWithBrackets = `[${chordText}]`;
+        const afterChordPos = pos + chordWithBrackets.length;
+
+        // Check if --- already exists after the chord
+        if (lineText.substring(afterChordPos, afterChordPos + 3) === '---') {
+            alert('--- already exists after this chord');
+            return;
+        }
+
+        // Insert --- after the chord
+        lines[line] = lineText.substring(0, afterChordPos) + '---' + lineText.substring(afterChordPos);
+
+        lyricsInput.value = lines.join('\n');
+        updatePreview();
+    }
+
+    // Add / before chord from context menu
+    function addSlashToChordFromContextMenu() {
+        if (!contextMenuTarget) return;
+
+        const line = parseInt(contextMenuTarget.getAttribute('data-line'));
+        const pos = parseInt(contextMenuTarget.getAttribute('data-pos'));
+
+        const lines = lyricsInput.value.split('\n');
+        const lineText = lines[line];
+
+        // Check if / already exists before the chord
+        if (pos > 0 && lineText.charAt(pos - 1) === '/') {
+            alert('/ already exists before this chord');
+            return;
+        }
+
+        // Insert / before the chord
+        lines[line] = lineText.substring(0, pos) + '/' + lineText.substring(pos);
+
+        lyricsInput.value = lines.join('\n');
+        updatePreview();
+    }
+
     // Add new chord at character
     function addNewChordAtCharacter() {
         if (!contextMenuTarget) return;
@@ -1821,6 +1886,65 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Update preview to re-render with or without character spans
+        updatePreview();
+    }
+
+    // Copy chord from button (cursor must be inside a chord)
+    function copyChordFromButton() {
+        const textarea = lyricsInput;
+        const fullText = textarea.value;
+        const pos = textarea.selectionStart;
+
+        // Search for chord boundaries around cursor
+        const left = fullText.lastIndexOf('[', pos);
+        const right = fullText.indexOf(']', pos);
+
+        if (left === -1 || right === -1 || left >= right) {
+            alert('Cursor must be inside a chord like [C].');
+            return;
+        }
+
+        const chord = fullText.substring(left, right + 1);
+        copiedChordBuffer = chord;
+        cutChordBuffer = chord;
+    }
+
+    // Delete chord from button (cursor must be inside a chord)
+    function deleteChordFromButton() {
+        const textarea = lyricsInput;
+        const fullText = textarea.value;
+        const pos = textarea.selectionStart;
+
+        // Search for chord boundaries around cursor
+        const left = fullText.lastIndexOf('[', pos);
+        const right = fullText.indexOf(']', pos);
+
+        if (left === -1 || right === -1 || left >= right) {
+            alert('Cursor must be inside a chord like [C].');
+            return;
+        }
+
+        // Check for --- after chord
+        let afterChordPos = right + 1;
+        if (fullText.substring(afterChordPos, afterChordPos + 3) === '---') {
+            afterChordPos += 3;
+        }
+
+        // Check for / before chord
+        let beforeChordPos = left;
+        if (left > 0 && fullText.charAt(left - 1) === '/') {
+            beforeChordPos = left - 1;
+        }
+
+        // Remove chord from text
+        const newText = fullText.substring(0, beforeChordPos) + fullText.substring(afterChordPos);
+        textarea.value = newText;
+
+        // Set cursor back to position after delete
+        textarea.selectionStart = beforeChordPos;
+        textarea.selectionEnd = beforeChordPos;
+        textarea.focus();
+
         updatePreview();
     }
 
