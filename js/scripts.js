@@ -292,6 +292,12 @@ function generateHtml(lyricsText, capoFret = 0, keyChords = [], fontSize = 16) {
                     charPosition--; // Adjust because we counted the / as text
                 }
 
+                // Check for --- before chord
+                let hasDashBefore = false;
+                if (i >= 3 && line.substring(i - 3, i) === '---') {
+                    hasDashBefore = true;
+                }
+
                 // Check for --- after chord
                 let hasDashAfter = false;
                 const afterPos = chords[chordIndex].end;
@@ -299,14 +305,26 @@ function generateHtml(lyricsText, capoFret = 0, keyChords = [], fontSize = 16) {
                     hasDashAfter = true;
                 }
 
+                // Check for / after chord
+                let hasSlashAfter = false;
+                if (line.charAt(afterPos) === '/') {
+                    hasSlashAfter = true;
+                }
+
                 // Add chord above at this character position
                 chordLineHtml += `<span class="chord-positioner" data-pos="${charPosition}">`;
+                if (hasDashBefore) {
+                    chordLineHtml += `<span style="color: #888; font-size:${fontSize + 2}px;">---</span>`;
+                }
                 if (hasSlashBefore) {
                     chordLineHtml += `<span style="color: #888; font-size:${fontSize + 2}px;">/</span>`;
                 }
                 chordLineHtml += `<span class="chord" data-original="${chord}" style="color:${chordColor}; font-size:${fontSize + 8}px; font-weight:bold;">${chord}</span>`;
                 if (hasDashAfter) {
                     chordLineHtml += `<span style="color: #888; font-size:${fontSize + 2}px;">---</span>`;
+                }
+                if (hasSlashAfter) {
+                    chordLineHtml += `<span style="color: #888; font-size:${fontSize + 2}px;">/</span>`;
                 }
                 chordLineHtml += `</span>`;
 
@@ -904,6 +922,12 @@ document.addEventListener('DOMContentLoaded', () => {
                             hasSlashBefore = true;
                         }
 
+                        // Check for --- before chord
+                        let hasDashBefore = false;
+                        if (i >= 3 && line.substring(i - 3, i) === '---') {
+                            hasDashBefore = true;
+                        }
+
                         // Check for --- after chord
                         let hasDashAfter = false;
                         const afterPos = chords[chordIndex].end;
@@ -911,14 +935,26 @@ document.addEventListener('DOMContentLoaded', () => {
                             hasDashAfter = true;
                         }
 
+                        // Check for / after chord
+                        let hasSlashAfter = false;
+                        if (line.charAt(afterPos) === '/') {
+                            hasSlashAfter = true;
+                        }
+
                         // Add chord above at this character position
                         chordLineHtml += `<span class="chord-positioner" data-pos="${charPosition}">`;
+                        if (hasDashBefore) {
+                            chordLineHtml += `<span style="color: #888; font-size: ${parseInt(fontSize) + 2}px;">---</span>`;
+                        }
                         if (hasSlashBefore) {
                             chordLineHtml += `<span style="color: #888; font-size: ${parseInt(fontSize) + 2}px;">/</span>`;
                         }
                         chordLineHtml += `<span class="${chordClass}" data-chord="${chord}" data-line="${lineIndex}" data-pos="${i}" style="font-size: ${parseInt(fontSize) + 4}px">${chord}</span>`;
                         if (hasDashAfter) {
                             chordLineHtml += `<span style="color: #888; font-size: ${parseInt(fontSize) + 2}px;">---</span>`;
+                        }
+                        if (hasSlashAfter) {
+                            chordLineHtml += `<span style="color: #888; font-size: ${parseInt(fontSize) + 2}px;">/</span>`;
                         }
                         chordLineHtml += `</span>`;
 
@@ -991,6 +1027,12 @@ document.addEventListener('DOMContentLoaded', () => {
                             charPosition--; // Adjust because we counted the / as text
                         }
 
+                        // Check for --- before chord
+                        let hasDashBefore = false;
+                        if (i >= 3 && line.substring(i - 3, i) === '---') {
+                            hasDashBefore = true;
+                        }
+
                         // Check for --- after chord
                         let hasDashAfter = false;
                         const afterPos = chords[chordIndex].end;
@@ -998,14 +1040,26 @@ document.addEventListener('DOMContentLoaded', () => {
                             hasDashAfter = true;
                         }
 
+                        // Check for / after chord
+                        let hasSlashAfter = false;
+                        if (line.charAt(afterPos) === '/') {
+                            hasSlashAfter = true;
+                        }
+
                         // Add chord above at this character position
                         chordLineHtml += `<span class="chord-positioner" data-pos="${charPosition}">`;
+                        if (hasDashBefore) {
+                            chordLineHtml += `<span style="color: #888; font-size: ${parseInt(fontSize) + 2}px;">---</span>`;
+                        }
                         if (hasSlashBefore) {
                             chordLineHtml += `<span style="color: #888; font-size: ${parseInt(fontSize) + 2}px;">/</span>`;
                         }
                         chordLineHtml += `<span class="${chordClass}" data-chord="${chord}" data-line="${lineIndex}" data-pos="${i}" style="font-size: ${parseInt(fontSize) + 4}px">${chord}</span>`;
                         if (hasDashAfter) {
                             chordLineHtml += `<span style="color: #888; font-size: ${parseInt(fontSize) + 2}px;">---</span>`;
+                        }
+                        if (hasSlashAfter) {
+                            chordLineHtml += `<span style="color: #888; font-size: ${parseInt(fontSize) + 2}px;">/</span>`;
                         }
                         chordLineHtml += `</span>`;
 
