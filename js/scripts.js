@@ -1425,12 +1425,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 action: addNewChordAtCharacter
             },
             {
-                label: 'Add --- Here',
+                label: 'Add --- to Chord',
                 icon: '➖',
                 action: addDashAtCharacter
             },
             {
-                label: 'Add / Here',
+                label: 'Add / to Chord',
                 icon: '➗',
                 action: addSlashAtCharacter
             }
@@ -1733,74 +1733,107 @@ document.addEventListener('DOMContentLoaded', () => {
         updatePreview();
     }
 
-    // Add --- at character position
+    // Add --- to chord at character position
     function addDashAtCharacter() {
         if (!contextMenuTarget) return;
 
-        // Find the insertion point before this character
+        // Find the line container and get the chord line
         const lineContainer = contextMenuTarget.closest('.line-container');
-        const lyricsLine = lineContainer.querySelector('.lyrics-line');
+        const chordLine = lineContainer.querySelector('.chord-line');
 
-        // Find corresponding insertion point
-        const insertionPoints = Array.from(lyricsLine.querySelectorAll('.insert-point'));
-        let targetInsertionPoint = null;
+        // Get the character position
+        const charPos = parseInt(contextMenuTarget.getAttribute('data-charpos'));
 
-        for (let i = 0; i < insertionPoints.length; i++) {
-            const nextChar = insertionPoints[i].nextElementSibling;
-            if (nextChar === contextMenuTarget) {
-                targetInsertionPoint = insertionPoints[i];
-                break;
+        // Find the chord at or before this character position
+        const chords = Array.from(chordLine.querySelectorAll('.clickable-chord'));
+        let targetChord = null;
+
+        for (let i = chords.length - 1; i >= 0; i--) {
+            const chordPosElement = chords[i].closest('.chord-positioner');
+            if (chordPosElement) {
+                const chordPos = parseInt(chordPosElement.getAttribute('data-pos'));
+                if (chordPos <= charPos) {
+                    targetChord = chords[i];
+                    break;
+                }
             }
         }
 
-        if (!targetInsertionPoint) {
-            alert('Could not find position for character');
+        if (!targetChord) {
+            alert('No chord found at this position');
             return;
         }
 
-        const line = parseInt(targetInsertionPoint.getAttribute('data-line'));
-        const pos = parseInt(targetInsertionPoint.getAttribute('data-pos'));
+        // Now add --- after this chord
+        const chordText = targetChord.getAttribute('data-chord');
+        const line = parseInt(targetChord.getAttribute('data-line'));
+        const pos = parseInt(targetChord.getAttribute('data-pos'));
 
-        // Insert ---
         const lines = lyricsInput.value.split('\n');
         const lineText = lines[line];
-        lines[line] = lineText.substring(0, pos) + '---' + lineText.substring(pos);
+
+        // Find the end of the chord
+        const chordWithBrackets = `[${chordText}]`;
+        const afterChordPos = pos + chordWithBrackets.length;
+
+        // Check if --- already exists
+        if (lineText.substring(afterChordPos, afterChordPos + 3) === '---') {
+            alert('--- already exists after this chord');
+            return;
+        }
+
+        // Insert --- after the chord
+        lines[line] = lineText.substring(0, afterChordPos) + '---' + lineText.substring(afterChordPos);
 
         lyricsInput.value = lines.join('\n');
         updatePreview();
     }
 
-    // Add / at character position
+    // Add / to chord at character position
     function addSlashAtCharacter() {
         if (!contextMenuTarget) return;
 
-        // Find the insertion point before this character
+        // Find the line container and get the chord line
         const lineContainer = contextMenuTarget.closest('.line-container');
-        const lyricsLine = lineContainer.querySelector('.lyrics-line');
+        const chordLine = lineContainer.querySelector('.chord-line');
 
-        // Find corresponding insertion point
-        const insertionPoints = Array.from(lyricsLine.querySelectorAll('.insert-point'));
-        let targetInsertionPoint = null;
+        // Get the character position
+        const charPos = parseInt(contextMenuTarget.getAttribute('data-charpos'));
 
-        for (let i = 0; i < insertionPoints.length; i++) {
-            const nextChar = insertionPoints[i].nextElementSibling;
-            if (nextChar === contextMenuTarget) {
-                targetInsertionPoint = insertionPoints[i];
-                break;
+        // Find the chord at or before this character position
+        const chords = Array.from(chordLine.querySelectorAll('.clickable-chord'));
+        let targetChord = null;
+
+        for (let i = chords.length - 1; i >= 0; i--) {
+            const chordPosElement = chords[i].closest('.chord-positioner');
+            if (chordPosElement) {
+                const chordPos = parseInt(chordPosElement.getAttribute('data-pos'));
+                if (chordPos <= charPos) {
+                    targetChord = chords[i];
+                    break;
+                }
             }
         }
 
-        if (!targetInsertionPoint) {
-            alert('Could not find position for character');
+        if (!targetChord) {
+            alert('No chord found at this position');
             return;
         }
 
-        const line = parseInt(targetInsertionPoint.getAttribute('data-line'));
-        const pos = parseInt(targetInsertionPoint.getAttribute('data-pos'));
+        // Now add / before this chord
+        const line = parseInt(targetChord.getAttribute('data-line'));
+        const pos = parseInt(targetChord.getAttribute('data-pos'));
 
-        // Insert /
         const lines = lyricsInput.value.split('\n');
         const lineText = lines[line];
+
+        // Check if / already exists
+        if (pos > 0 && lineText.charAt(pos - 1) === '/') {
+            alert('/ already exists before this chord');
+            return;
+        }
+
+        // Insert / before the chord
         lines[line] = lineText.substring(0, pos) + '/' + lineText.substring(pos);
 
         lyricsInput.value = lines.join('\n');
